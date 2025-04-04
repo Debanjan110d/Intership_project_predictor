@@ -3,8 +3,8 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = 'your-secret-key'
-DEBUG = True
-ALLOWED_HOSTS = []
+DEBUG = False
+ALLOWED_HOSTS = ['Debanjan110d.pythonanywhere.com']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -45,6 +45,10 @@ TEMPLATES = [
 ]
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Optional: Add CSRF trusted origins
+CSRF_TRUSTED_ORIGINS = ['https://Debanjan110d.pythonanywhere.com']
 
 # Messages settings
 from django.contrib import messages
