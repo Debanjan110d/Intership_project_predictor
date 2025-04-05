@@ -1,6 +1,5 @@
 # Model Training Documentation
-
-This document details the machine learning model development process for the Purchase Intent Predictor.
+[← Back to README](../README.md) | [Django Deployment Guide →](django_deployment.md)
 
 ## Table of Contents
 - [Data Overview](#data-overview)
@@ -57,6 +56,29 @@ for col in categorical_cols:
     label_encoders[col] = le
 ```
 
+## Model Training Process
+![Feature Distribution Analysis](images/feature_distributions.png)
+*Distribution of key features in training data*
+
+### Data Pipeline
+```python
+data_preprocessing():
+    1. Load data from data.csv
+    2. Handle missing values
+    3. Encode categorical variables
+    4. Scale numerical features
+```
+
+### Model Selection
+We evaluated multiple algorithms:
+- Random Forest (Selected ✓)
+- Gradient Boosting
+- SVM
+- Neural Networks
+
+![Model Performance](images/confusion_matrix.png)
+*Confusion Matrix showing model performance*
+
 ## Model Performance
 - Accuracy: 85%
 - F1 Score: 0.83
@@ -91,3 +113,6 @@ The model is converted to interpretable rules:
 ```
 
 For detailed implementation, see [train_model.py](../purchase_predictor/predictor/train_model.py)
+
+## Next Steps
+See the [Django Deployment Guide](django_deployment.md) for implementing the web interface.
