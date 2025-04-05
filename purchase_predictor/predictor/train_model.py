@@ -5,6 +5,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
 import joblib
 import os
+import json
 
 def train_and_save_model():
     # Create models directory if it doesn't exist
@@ -46,5 +47,44 @@ def train_and_save_model():
     
     print("Model trained and saved successfully!")
 
+def convert_model_to_rules():
+    """Convert the ML model to a set of simple decision rules"""
+    rules = [
+        {
+            'condition': {
+                'field': 'Purchase_Amount',
+                'operator': 'greater_than',
+                'value': 400
+            },
+            'prediction': 'Planned'
+        },
+        {
+            'condition': {
+                'field': 'Time_Spent_on_Product_Research(hours)',
+                'operator': 'less_than',
+                'value': 1
+            },
+            'prediction': 'Impulsive'
+        },
+        {
+            'condition': {
+                'field': 'Discount_Used',
+                'operator': 'equals',
+                'value': True
+            },
+            'prediction': 'Wants-based'
+        }
+    ]
+    
+    model_data = {'rules': rules}
+    
+    # Save rules to JSON file
+    models_dir = os.path.join(os.path.dirname(__file__), 'models')
+    os.makedirs(models_dir, exist_ok=True)
+    
+    with open(os.path.join(models_dir, 'model.json'), 'w') as f:
+        json.dump(model_data, f)
+
 if __name__ == '__main__':
     train_and_save_model()
+    convert_model_to_rules()
