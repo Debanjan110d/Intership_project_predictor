@@ -22,9 +22,65 @@ def predict(request):
                     'Customer_Loyalty_Program_Member': form.cleaned_data['loyalty_member']
                 }
 
-                # Load model and encoders
+                # Ensure models directory exists
                 model_path = os.path.join(os.path.dirname(__file__), 'models')
-                with open(os.path.join(model_path, 'model.json'), 'r') as f:
+                os.makedirs(model_path, exist_ok=True)
+                
+                model_file = os.path.join(model_path, 'model.json')
+                
+                # Create default model file if it doesn't exist
+                if not os.path.exists(model_file):
+                    default_model = {
+                        "rules": [
+                            {
+                                "condition": {
+                                    "field": "Purchase_Amount",
+                                    "operator": "greater_than",
+                                    "value": 400
+                                },
+                                "prediction": "Planned",
+                                "probabilities": {
+                                    "Planned": 70,
+                                    "Impulsive": 10,
+                                    "Wants-based": 15,
+                                    "Need-based": 5
+                                }
+                            },
+                            {
+                                "condition": {
+                                    "field": "Time_Spent_on_Product_Research(hours)",
+                                    "operator": "less_than",
+                                    "value": 1
+                                },
+                                "prediction": "Impulsive",
+                                "probabilities": {
+                                    "Planned": 10,
+                                    "Impulsive": 65,
+                                    "Wants-based": 15,
+                                    "Need-based": 10
+                                }
+                            },
+                            {
+                                "condition": {
+                                    "field": "Discount_Used",
+                                    "operator": "equals",
+                                    "value": True
+                                },
+                                "prediction": "Wants-based",
+                                "probabilities": {
+                                    "Planned": 15,
+                                    "Impulsive": 20,
+                                    "Wants-based": 55,
+                                    "Need-based": 10
+                                }
+                            }
+                        ]
+                    }
+                    with open(model_file, 'w') as f:
+                        json.dump(default_model, f)
+
+                # Load model and make prediction
+                with open(model_file, 'r') as f:
                     model_data = json.load(f)
                     
                 # Make prediction using the model data
@@ -32,7 +88,8 @@ def predict(request):
                 
                 # Store prediction data in session
                 request.session['prediction_data'] = {
-                    'prediction': prediction,
+                    'prediction': prediction[0],
+                    'probabilities': prediction[1],
                     'input_data': input_data
                 }
                 
@@ -56,11 +113,27 @@ def result(request):
     return render(request, 'predictor/result.html', prediction_data)
 
 def predict_purchase_intent(input_data, model_data):
-    # Simple decision tree implementation using the model data
+    # Calculate simple prediction based on rules
     for rule in model_data['rules']:
         if evaluate_rule(input_data, rule['condition']):
-            return rule['prediction']
-    return 'Need-based'  # Default prediction
+            return rule['prediction'], {}
+    
+    # Default prediction with no probabilities
+    return determine_default_prediction(input_data), {}
+
+def determine_default_prediction(input_data):
+    # Simple logic for default prediction
+    amount = float(input_data['Purchase_Amount'])
+    research_time = float(input_data['Time_Spent_on_Product_Research(hours)'])
+    
+    if amount > 400 or research_time > 2:
+        return 'Planned'
+    elif amount < 100 or research_time < 0.5:
+        return 'Impulsive'
+    elif input_data['Discount_Used']:
+        return 'Wants-based'
+    else:
+        return 'Need-based'
 
 def evaluate_rule(input_data, condition):
     # Evaluate a single rule condition

@@ -1,0 +1,28 @@
+{
+    "rules": [
+        {
+            "condition": {
+                "field": "Purchase_Amount",
+                "operator": "greater_than",
+                "value": 400
+            },
+            "prediction": "Planned"
+        },
+        {
+            "condition": {
+                "field": "Time_Spent_on_Product_Research(hours)",
+                "operator": "less_than",
+                "value": 1
+            },
+            "prediction": "Impulsive"
+        },
+        {
+            "condition": {
+                "field": "Discount_Used",
+                "operator": "equals",
+                "value": true
+            },
+            "prediction": "Wants-based"
+        }
+    ]
+}
