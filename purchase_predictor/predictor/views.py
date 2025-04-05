@@ -113,24 +113,53 @@ def result(request):
     return render(request, 'predictor/result.html', prediction_data)
 
 def predict_purchase_intent(input_data, model_data):
-    # Calculate simple prediction based on rules
+    # Initialize scores for each category
+    scores = {
+        'Planned': 0,
+        'Impulsive': 0,
+        'Wants-based': 0,
+        'Need-based': 0
+    }
+    
+    # Check each rule and accumulate scores
+    matches = 0
     for rule in model_data['rules']:
         if evaluate_rule(input_data, rule['condition']):
-            return rule['prediction'], {}
+            matches += 1
+            if 'probabilities' in rule:
+                for intent, prob in rule['probabilities'].items():
+                    scores[intent] += prob
+            else:
+                scores[rule['prediction']] += 100
+
+    # If no rules matched, use default logic
+    if matches == 0:
+        default_pred = determine_default_prediction(input_data)
+        scores[default_pred] = 100
+    else:
+        # Normalize scores
+        total = sum(scores.values())
+        if total > 0:
+            for intent in scores:
+                scores[intent] = round((scores[intent] / total) * 100)
+
+    # Get prediction (highest scoring intent)
+    prediction = max(scores.items(), key=lambda x: x[1])[0]
     
-    # Default prediction with no probabilities
-    return determine_default_prediction(input_data), {}
+    # Return both prediction and probabilities
+    return prediction, scores
 
 def determine_default_prediction(input_data):
-    # Simple logic for default prediction
     amount = float(input_data['Purchase_Amount'])
     research_time = float(input_data['Time_Spent_on_Product_Research(hours)'])
+    loyalty = input_data['Customer_Loyalty_Program_Member']
     
-    if amount > 400 or research_time > 2:
+    # More sophisticated default logic
+    if amount > 400 and research_time > 1.5:
         return 'Planned'
-    elif amount < 100 or research_time < 0.5:
+    elif amount < 100 and research_time < 0.5:
         return 'Impulsive'
-    elif input_data['Discount_Used']:
+    elif loyalty and input_data['Discount_Used']:
         return 'Wants-based'
     else:
         return 'Need-based'

@@ -6,15 +6,27 @@
                 "operator": "greater_than",
                 "value": 400
             },
-            "prediction": "Planned"
+            "prediction": "Planned",
+            "probabilities": {
+                "Planned": 70,
+                "Impulsive": 10,
+                "Wants-based": 15,
+                "Need-based": 5
+            }
         },
         {
             "condition": {
                 "field": "Time_Spent_on_Product_Research(hours)",
                 "operator": "less_than",
-                "value": 1
+                "value": 0.5
             },
-            "prediction": "Impulsive"
+            "prediction": "Impulsive",
+            "probabilities": {
+                "Planned": 10,
+                "Impulsive": 65,
+                "Wants-based": 15,
+                "Need-based": 10
+            }
         },
         {
             "condition": {
@@ -22,7 +34,27 @@
                 "operator": "equals",
                 "value": true
             },
-            "prediction": "Wants-based"
+            "prediction": "Wants-based",
+            "probabilities": {
+                "Planned": 15,
+                "Impulsive": 20,
+                "Wants-based": 55,
+                "Need-based": 10
+            }
+        },
+        {
+            "condition": {
+                "field": "Customer_Loyalty_Program_Member",
+                "operator": "equals",
+                "value": true
+            },
+            "prediction": "Need-based",
+            "probabilities": {
+                "Planned": 20,
+                "Impulsive": 15,
+                "Wants-based": 25,
+                "Need-based": 40
+            }
         }
     ]
 }
