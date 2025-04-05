@@ -53,5 +53,18 @@ class PredictionForm(forms.Form):
     device = forms.ChoiceField(choices=DEVICE_CHOICES, widget=forms.Select(attrs={'class': 'form-control'}))
     
     # Boolean fields
-    discount_used = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
-    loyalty_member = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
+    discount_used = forms.BooleanField(
+        required=False, 
+        initial=False,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+    loyalty_member = forms.BooleanField(
+        required=False,
+        initial=False, 
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        # Add any custom validation here if needed
+        return cleaned_data

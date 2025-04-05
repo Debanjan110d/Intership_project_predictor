@@ -7,14 +7,10 @@ import os
 import numpy as np
 
 def predict(request):
-    prediction_result = None
-    probabilities = None
-    input_data = None
-
     if request.method == 'POST':
-        form = PredictionForm(request.POST)
-        if form.is_valid():
-            try:
+        try:
+            form = PredictionForm(request.POST)
+            if form.is_valid():
                 # Prepare input data
                 input_data = {
                     'Age': form.cleaned_data['age'],
@@ -48,19 +44,31 @@ def predict(request):
                 intent_types = ['Impulsive', 'Need-based', 'Planned', 'Wants-based']
                 prob_dict = {intent: round(prob * 100, 2) for intent, prob in zip(intent_types, probabilities)}
                 
-                # Redirect to result page with prediction data
-                return render(request, 'predictor/result.html', {
+                # Store prediction data in session
+                request.session['prediction_data'] = {
                     'prediction': prediction_result,
                     'probabilities': prob_dict,
                     'input_data': input_data
-                })
+                }
+                return redirect('result')
                 
-            except Exception as e:
-                messages.error(request, f'Prediction error: {str(e)}')
-                print(f"Error during prediction: {str(e)}")
+            else:
+                print("Form errors:", form.errors)
+                messages.error(request, "Please correct the form errors.")
+                return render(request, 'predictor/predict.html', {'form': form})
+                
+        except Exception as e:
+            messages.error(request, f'Error: {str(e)}')
+            print(f"Error during prediction: {str(e)}")
+            return render(request, 'predictor/predict.html', {'form': PredictionForm()})
     else:
         form = PredictionForm()
 
-    return render(request, 'predictor/predict.html', {
-        'form': form
-    })
+    return render(request, 'predictor/predict.html', {'form': form})
+
+def result(request):
+    prediction_data = request.session.get('prediction_data')
+    if not prediction_data:
+        return redirect('predict')
+    
+    return render(request, 'predictor/result.html', prediction_data)

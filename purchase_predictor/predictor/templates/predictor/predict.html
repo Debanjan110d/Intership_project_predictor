@@ -28,6 +28,7 @@
 
             <form method="post" action="{% url 'predict' %}" class="space-y-6" novalidate>
                 {% csrf_token %}
+                {{ form.non_field_errors }}
                 {% for field in form %}
                     {% if field.field.widget.input_type == "checkbox" %}
                         <div class="flex items-center space-x-2">

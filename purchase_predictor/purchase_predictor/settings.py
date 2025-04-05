@@ -3,8 +3,8 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = 'your-secret-key'
-DEBUG = False
-ALLOWED_HOSTS = ['Debanjan110d.pythonanywhere.com']
+DEBUG = True  # Change to True temporarily
+ALLOWED_HOSTS = ['Debanjan110d.pythonanywhere.com', 'localhost', '127.0.0.1']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -31,7 +31,7 @@ ROOT_URLCONF = 'purchase_predictor.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'predictor/templates')],  # Updated template dir
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -62,3 +62,10 @@ MESSAGE_TAGS = {
 }
 
 MESSAGES_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+}

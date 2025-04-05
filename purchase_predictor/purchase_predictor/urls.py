@@ -5,5 +5,5 @@ from predictor import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.predict, name='predict'),
-    path('result/', views.predict, name='result'),
+    path('result/', views.result, name='result'),  # Changed to separate view
 ]

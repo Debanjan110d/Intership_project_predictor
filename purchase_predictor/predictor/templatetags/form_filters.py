@@ -4,9 +4,9 @@ register = template.Library()
 
 @register.filter(name='addclass')
 def addclass(value, arg):
-    css_classes = value.field.widget.attrs.get('class', '')
-    if (css_classes):
-        css_classes = f"{css_classes} {arg}"
+    """Add CSS classes to form field"""
+    if 'class' in value.field.widget.attrs:
+        value.field.widget.attrs['class'] += f' {arg}'
     else:
-        css_classes = arg
-    return value.as_widget(attrs={'class': css_classes})
+        value.field.widget.attrs['class'] = arg
+    return value
